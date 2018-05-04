@@ -1,0 +1,2 @@
+# tracehash
+Stacktrace signatures
