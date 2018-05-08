@@ -52,6 +52,7 @@ java.lang.AssertionError
         at dotty.tools.dotc.ast.Positioned.$anonfun$checkPos$4$adapted
         at scala.collection.immutable.List.foreach
 ```
+and then hash it using SHA-1.
 
 ### Stack overflows
 
