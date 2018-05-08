@@ -1,4 +1,4 @@
-# tracehash
+# TraceHash
 TraceHash hashes your exception stacktraces into exception signatures
 that formalize the intuitive notion of "exception sameness": exceptions
 with the same signature are normally considered "the same".
@@ -14,7 +14,7 @@ tracehash.stackTraceHash(exception)
 
 ## Motivation
 
-Say you are fuzzing some Java application, and suddenly get an `AssertionError`:
+Say you are fuzzing a Java application, and find an `AssertionError`:
 
 ```scala
 java.lang.AssertionError: assertion failed: position error: position not set for Ident(<error>) # 5299
