@@ -1,5 +1,5 @@
 # TraceHash
-TraceHash hashes your exceptions into exception signatures that formalize the intuitive notion of "exception sameness": exceptions with the same signature are normally considered "the same" (i.e. when filing bug reports).
+TraceHash hashes your exceptions into exception signatures that formalize the intuitive notion of "exception sameness": exceptions with the same signature are normally considered "the same" (e.g. when filing bug reports).
 
 ## Usage
 
