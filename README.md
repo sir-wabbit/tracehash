@@ -32,11 +32,11 @@ use to compare different exception traces?
 **Should we compare the entire stacktrace?**
 No, folklore and experience tells us that only the last few stacktrace entries are important.
 
+**Should we compare exception messages?**
+Unless we can inspect the code generating messages, we don't know which parts of the message stay constant and which depend on a particular fuzzer input or change non-deterministically.
+
 **Should we compare line numbers?**
 If someone changes one of the files appearing in the stacktrace without fixing the error, line numbers might change, but the error won't. Therefore, we should not take line numbers into account.
-
-**Should we compare messages?**
-Unless we can inspect the code generating messages, we don't know which parts of the message stay constant and which depend on a particular fuzzer input or change non-deterministically.
 
 **Should we compare file names?**
 File names are less important than class names, especially in Scala, where a single file can contain multiple classes.
