@@ -115,3 +115,19 @@ and a prefix of length 1:
 Clearly, the prefix is not important, only the repeating fragment *is*.
 
 Note that looking at the very end of a `StackOveflowException` stacktrace, we can not tell how the repeating fragment started. For instance, let's imagine that our stacktrace ends in `d b a b c a b c a b c`. We can not tell if the repeating fragment is `a b c` or `b c a` or `c a b`. In order to produce consistent signatures, `TraceHash` sorts all possible options in lexicographic order.
+
+`TraceHash` would simplify the above exception stacktrace down to (modulo possible reordering of the entries as explained above):
+```scala
+java.lang.StackOverflowError
+        at dotty.tools.dotc.util.Stats$.track
+        at dotty.tools.dotc.core.TypeApplications$.typeParams$extension
+        at dotty.tools.dotc.core.TypeApplications$.$anonfun$typeParams$extension$1
+        at dotty.tools.dotc.util.Stats$.track
+        at dotty.tools.dotc.core.TypeApplications$.typeParams$extension
+        at dotty.tools.dotc.core.TypeApplications$.$anonfun$typeParams$extension$1
+        at dotty.tools.dotc.util.Stats$.track
+        at dotty.tools.dotc.core.TypeApplications$.typeParams$extension
+        at dotty.tools.dotc.core.TypeApplications$.$anonfun$typeParams$extension$1
+        at dotty.tools.dotc.util.Stats$.track
+        at dotty.tools.dotc.core.TypeApplications$.typeParams$extension
+```
