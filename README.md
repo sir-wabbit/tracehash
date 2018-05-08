@@ -1,8 +1,7 @@
 # tracehash
 TraceHash hashes your exception stacktraces into exception signatures
-that formalize the intuitive notion of "exception equality": exceptions
-that have the same signature would usually be considered "the same".
-
+that formalize the intuitive notion of "exception sameness": exceptions
+with the same signature are normally considered "the same".
 
 ## Usage
 
@@ -10,13 +9,14 @@ that have the same signature would usually be considered "the same".
 tracehash.stackTraceHash(exception)
 // will produce something like
 // "SOE-b33ffcec6a101750802bcebecae59e6a657145aa"
+// or "IOOBE-1b4035e1d5b6023ecd1ef2673278057b5a3bb44c"
 ```
 
 ## Motivation
 
 Say you are fuzzing some Java application, and suddenly get an `AssertionError`:
 
-```
+```scala
 java.lang.AssertionError: assertion failed: position error: position not set for Ident(<error>) # 5299
         at scala.Predef$.assert(Predef.scala:219)
         at dotty.tools.dotc.ast.Positioned.check$1(Positioned.scala:179)
@@ -34,28 +34,28 @@ probably related, and you should only file one issue for both of them.
 But what exactly do we mean by "same error"? What algorithm should we
 use to compare different exception traces?
 
-###### Should we compare the entire stacktrace?
+**Should we compare the entire stacktrace?**
 No, folklore and experience tells us that only the last few stacktrace
 entries are important.
 
-###### Should we compare line numbers?
+**Should we compare line numbers?**
 If someone changes one of the files appearing in the stacktrace without
 fixing the error, line numbers might change, but the error won't.
 Therefore, we should not take line numbers into account.
 
-###### Should we compare messages?
+**Should we compare messages?**
 Unless we can inspect the code generating messages, we don't know which
 parts of the message stay constant and which depend on a particular
 fuzzer input or change non-deterministically.
 
-###### Should we compare file names?
+**Should we compare file names?**
 File names are less important than class names, especially in Scala,
 where a single file can contain multiple classes.
 
 ---
 
 Simplified exception trace:
-```
+```scala
 java.lang.AssertionError
         at scala.Predef$.assert
         at dotty.tools.dotc.ast.Positioned.check$1
@@ -69,7 +69,7 @@ java.lang.AssertionError
 Special care needs to be taken to simplify `StackOverflowException`,
 such as:
 
-```
+```scala
 java.lang.StackOverflowError
         at dotty.tools.dotc.core.Types$TypeProxy.superType(Types.scala:1460)
         at dotty.tools.dotc.core.TypeApplications$.$anonfun$typeParams$extension$1(TypeApplications.scala:192)
@@ -104,7 +104,7 @@ java.lang.StackOverflowError
 
 We can see that this stacktrace consists of a repeating fragment of
 length 11:
-```
+```scala
         at dotty.tools.dotc.util.Stats$.track(Stats.scala:35)
         at dotty.tools.dotc.core.TypeApplications$.typeParams$extension(TypeApplications.scala:171)
         at dotty.tools.dotc.core.TypeApplications$.$anonfun$typeParams$extension$1(TypeApplications.scala:182)
@@ -119,7 +119,7 @@ length 11:
 ```
 
 and a prefix of length 1:
-```
+```scala
         at dotty.tools.dotc.core.Types$TypeProxy.superType(Types.scala:1460)
 ```
 
