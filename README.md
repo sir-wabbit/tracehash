@@ -1,5 +1,5 @@
 # TraceHash
-TraceHash hashes your exceptions into exception signatures that formalize the intuitive notion of "exception sameness": exceptions with the same signature are normally considered "the same" (e.g. when filing bug reports).
+`TraceHash` hashes your exceptions into exception signatures that formalize the intuitive notion of "exception sameness": exceptions with the same signature are normally considered "the same" (e.g. when filing bug reports).
 
 ## Usage
 
@@ -43,7 +43,7 @@ File names are less important than class names, especially in Scala, where a sin
 
 ---
 
-Simplified exception trace:
+`TraceHash` would simplify the above exception down to:
 ```scala
 java.lang.AssertionError
         at scala.Predef$.assert
