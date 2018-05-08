@@ -26,7 +26,7 @@ java.lang.AssertionError: assertion failed: position error: position not set for
         ....
 ```
 
-If the same `AssertionError` happens in another file, the two errors are probably related, and you should only file one issue for both of them. But what exactly do we mean by "same error"? What algorithm should we
+If the same `AssertionError` happens with a different input file, the two errors are probably related, and you should only file one issue for both of them. But what exactly do we mean by "same error"? What algorithm should we
 use to compare different exception traces?
 
 **Should we compare the entire stacktrace?**
