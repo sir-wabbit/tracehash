@@ -1,4 +1,4 @@
-package tracehash
+package tracehash.internal
 
 import org.scalatest.{FunSuite, Matchers}
 import org.scalacheck.{Arbitrary, Gen}
@@ -16,69 +16,37 @@ class Tests extends FunSuite with Matchers with GeneratorDrivenPropertyChecks {
     } yield new StackTraceElement(cn, mn, fn, ln)
   }
 
-  implicit def arbSlice[A](implicit A: Arbitrary[A], ACT: ClassTag[A]): Arbitrary[Slice[A]] = Arbitrary {
-    for {
-      arr <- Gen.containerOf[Array, A](A.arbitrary)
-      i   <- Gen.choose(0, arr.length)
-      l   <- Gen.choose(0, arr.length - i)
-    } yield Slice.of(arr).slice(i, l)
-  }
-
-  test("slice toList") {
-    forAll { s: Array[Int] => Slice.of(s).toList shouldEqual s.toList }
-  }
-
-  test("slice reverse toList") {
-    forAll { s: Array[Int] => Slice.of(s).reverse.toList shouldEqual s.toList.reverse }
-  }
-
-  test("slice empty array") {
-    forAll { s: Array[Int] => Slice.of(s).slice(0, 0).toList shouldEqual Nil }
-  }
-
-  test("slice reverse length") {
-    forAll { s: Slice[Int] => s.reverse.length shouldEqual s.length }
-  }
-
-  test("slice reverse 0") {
-    forAll { s: Slice[Int] => if (s.length > 0) s.reverse(0) shouldEqual s(s.length - 1) }
-  }
-
-  test("slice reverse len-1") {
-    forAll { s: Slice[Int] => if (s.length > 0) s.reverse(s.length - 1) shouldEqual s(0) }
-  }
-
-  test("sha1") {
-    sha1("string") shouldEqual "ecb252044b5ea0f679ee78ec1a12904739e2904d"
-  }
+//  test("sha1") {
+//    sha1("string") shouldEqual "ecb252044b5ea0f679ee78ec1a12904739e2904d"
+//  }
 
   test("bestCover(_, 1)") {
     forAll { s: Array[StackTraceElement] =>
-      val c = new Util.MutableCover
-      Util.bestCover(s, 1, 1, c)
+      val c = new SOCoverSolver.Result
+      SOCoverSolver.solve(s, 1, 1, c)
     }
 
     val a = new StackTraceElement("a", "a", "a", 0)
     val b = new StackTraceElement("b", "b", "b", 1)
     val c = new StackTraceElement("c", "c", "c", 2)
-    val r = new Util.MutableCover
+    val r = new SOCoverSolver.Result
 
     {
-      Util.bestCover(Array(b, a, a, a, a), 1, 1, r)
+      SOCoverSolver.solve(Array(b, a, a, a, a), 1, 1, r)
       r.coverLength shouldEqual 4
       r.fragmentLength shouldEqual 1
       r.suffixLength shouldEqual 1
     }
 
     {
-      Util.bestCover(Array(b, a, b, a, a), 1, 1, r)
+      SOCoverSolver.solve(Array(b, a, b, a, a), 1, 1, r)
       r.coverLength shouldEqual 2
       r.fragmentLength shouldEqual 1
       r.suffixLength shouldEqual 1
     }
 
     {
-      Util.bestCover(Array(b, a, b, a, c), 1, 1, r)
+      SOCoverSolver.solve(Array(b, a, b, a, c), 1, 1, r)
       r.coverLength shouldEqual 0
       r.fragmentLength shouldEqual 0
       r.suffixLength shouldEqual 0
@@ -87,45 +55,45 @@ class Tests extends FunSuite with Matchers with GeneratorDrivenPropertyChecks {
 
   test("bestCover(_, 2)") {
     forAll { s: Array[StackTraceElement] =>
-      val c = new Util.MutableCover
-      Util.bestCover(s, 2, 1, c)
+      val c = new SOCoverSolver.Result
+      SOCoverSolver.solve(s, 2, 1, c)
     }
 
     val a = new StackTraceElement("a", "a", "a", 0)
     val b = new StackTraceElement("b", "b", "b", 1)
     val c = new StackTraceElement("c", "c", "c", 2)
-    val r = new Util.MutableCover
+    val r = new SOCoverSolver.Result
 
     {
-      Util.bestCover(Array(b, a, a, a, a), 2, 1, r)
+      SOCoverSolver.solve(Array(b, a, a, a, a), 2, 1, r)
       r.coverLength shouldEqual 4
       r.fragmentLength shouldEqual 1
       r.suffixLength shouldEqual 1
     }
 
     {
-      Util.bestCover(Array(b, a, b, a, a), 2, 1, r)
+      SOCoverSolver.solve(Array(b, a, b, a, a), 2, 1, r)
       r.coverLength shouldEqual 2
       r.fragmentLength shouldEqual 1
       r.suffixLength shouldEqual 1
     }
 
     {
-      Util.bestCover(Array(b, a, b, a, c), 2, 1, r)
+      SOCoverSolver.solve(Array(b, a, b, a, c), 2, 1, r)
       r.coverLength shouldEqual 0
       r.fragmentLength shouldEqual 0
       r.suffixLength shouldEqual 0
     }
 
     {
-      Util.bestCover(Array(b, a, b, a, b), 2, 1, r)
+      SOCoverSolver.solve(Array(b, a, b, a, b), 2, 1, r)
       r.coverLength shouldEqual 5
       r.fragmentLength shouldEqual 2
       r.suffixLength shouldEqual 1
     }
 
     {
-      Util.bestCover(Array(b, b, a, b, a, b), 2, 1, r)
+      SOCoverSolver.solve(Array(b, b, a, b, a, b), 2, 1, r)
       r.coverLength shouldEqual 5
       r.fragmentLength shouldEqual 2
       r.suffixLength shouldEqual 1
@@ -136,50 +104,42 @@ class Tests extends FunSuite with Matchers with GeneratorDrivenPropertyChecks {
     val a = new StackTraceElement("a", "a", "a", 0)
     val b = new StackTraceElement("b", "b", "b", 1)
     val c = new StackTraceElement("c", "c", "c", 2)
-    val r = new Util.MutableCover
+    val r = new SOCoverSolver.Result
 
     {
-      Util.bestCover(Array(b, b, a, b, a, b, a, b), 3, 2, r)
+      SOCoverSolver.solve(Array(b, b, a, b, a, b, a, b), 3, 2, r)
       r.coverLength shouldEqual 7
       r.fragmentLength shouldEqual 2
       r.suffixLength shouldEqual 1
     }
 
     {
-      Util.bestCover(Array(b, b, a, b, a, b, a, b), 255, 2, r)
+      SOCoverSolver.solve(Array(b, b, a, b, a, b, a, b), 255, 2, r)
       r.coverLength shouldEqual 7
       r.fragmentLength shouldEqual 2
       r.suffixLength shouldEqual 1
     }
   }
 
-  test("principalStackTrace returns same array slice") {
-    forAll { (s: Array[StackTraceElement], b: Boolean) =>
-      val r = principalStackTrace(s, b)
-      (r.array eq s) shouldEqual true
-    }
-  }
-
-  test("principalStackTrace returns a reversed slice") {
-    forAll { (s: Array[StackTraceElement], b: Boolean) =>
-      val r = principalStackTrace(s, b)
-      r.reversed shouldEqual true
-    }
-  }
-
-  test("principalSOStackTrace") {
+  test("KeyStackTraceComponent") {
     val a = new StackTraceElement("a", "a", "a", 0)
     val b = new StackTraceElement("b", "b", "b", 1)
     val c = new StackTraceElement("c", "c", "c", 2)
 
     {
-      val r = principalSOStackTrace(Array(b, b, a, b, a, b, a, b))
-      r.map(_.toList) shouldEqual Some(List(b, a))
+      val state = new KeyStackTraceComponent.State
+      val stack = Array(b, b, a, b, a, b, a, b)
+      KeyStackTraceComponent.getSO(stack, 255, 2, state)
+      stack.slice(state.index, state.index + state.length) shouldEqual Array(a, b)
     }
 
     {
-      val r = principalSOStackTrace(Array(b, b, a, b, c, a, b, c, a, b))
-      r.map(_.toList) shouldEqual Some(List(c, b, a))
+      val state = new KeyStackTraceComponent.State
+      val stack = Array(b, b, a, b, c, a, b, c, a, b)
+      KeyStackTraceComponent.getSO(stack, 255, 2, state)
+      stack.slice(state.index, state.index + state.length) shouldEqual Array(a, b, c)
     }
   }
+
+  test("")
 }
