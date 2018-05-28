@@ -1,6 +1,6 @@
 lazy val common = Seq(
   organization      := "com.alexknvl",
-  version           := "0.0.1-SNAPSHOT",
+  version           := "0.0.2-SNAPSHOT",
   scalaVersion      := "2.12.6",
   libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test",
   libraryDependencies += "org.scalacheck" %% "scalacheck" % "1.14.0" % "test")
@@ -8,3 +8,7 @@ lazy val common = Seq(
 
 lazy val root = project.in(file("."))
   .settings(common : _*)
+  .settings(
+    name := "tracehash",
+    crossPaths := false,
+    autoScalaLibrary := false)
