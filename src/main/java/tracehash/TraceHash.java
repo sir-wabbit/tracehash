@@ -23,7 +23,7 @@ public class TraceHash {
         }
     }
 
-    public String hash(Parameters parameters, Throwable throwable, State state) {
+    public static String hash(Parameters parameters, Throwable throwable, State state) {
         final StackTraceElement[] stackTrace = throwable.getStackTrace();
 
         KeyStackTraceComponent.get(stackTrace,
@@ -57,14 +57,14 @@ public class TraceHash {
         return resultBuilder.toString();
     }
 
-    public String hash(Parameters parameters, Throwable throwable) {
+    public static String hash(Parameters parameters, Throwable throwable) {
         State state;
         try {
             state = new State();
         } catch (StateInitializationException e) {
             throw new Error(e);
         }
-        return hash(parameters, throwable);
+        return hash(parameters, throwable, state);
     }
 
     private static class StateInitializationException extends Exception {
