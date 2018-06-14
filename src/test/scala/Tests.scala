@@ -3,6 +3,7 @@ package tracehash.internal
 import org.scalatest.{FunSuite, Matchers}
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
+import tracehash.TraceHash
 
 import scala.reflect.ClassTag
 
@@ -141,5 +142,31 @@ class Tests extends FunSuite with Matchers with GeneratorDrivenPropertyChecks {
     }
   }
 
-  test("")
+  final case class Mocked(stack: Array[StackTraceElement]) extends Throwable {
+    override def getStackTrace: Array[StackTraceElement] = stack
+  }
+
+  final case class MockedSO(stack: Array[StackTraceElement]) extends StackOverflowError {
+    override def getStackTrace: Array[StackTraceElement] = stack
+  }
+
+  test("TraceHash.principal") {
+    val a = new StackTraceElement("a", "a", "a", 0)
+    val b = new StackTraceElement("b", "b", "b", 1)
+    val c = new StackTraceElement("c", "c", "c", 2)
+
+    val params = new TraceHash.Parameters(255, 2, 3, false)
+
+    {
+      val stack = Array(b, b, a, b, a, b, a, b)
+      TraceHash.principal(params, Mocked(stack)) shouldEqual Array(b, b, a)
+      TraceHash.principal(params, MockedSO(stack)) shouldEqual Array(a, b)
+    }
+
+    {
+      val stack = Array(b, b, a, b, c, a, b, c, a, b)
+      TraceHash.principal(params, Mocked(stack)) shouldEqual Array(b, b, a)
+      TraceHash.principal(params, MockedSO(stack)) shouldEqual Array(a, b, c)
+    }
+  }
 }
